@@ -1,0 +1,25 @@
+{
+    "name": "sqlite-test",
+    "version": "1.0.0",
+    "description": "An app to test the new sqlite module built in to nodejs",
+    "main": "index.js",
+    "type": "module",
+    "engines": {
+        "node": ">=22.13.1"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node index.js",
+        "dev": "node --env-file=.env --watch index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/KSmith8888/node-sqlite-test.git"
+    },
+    "author": "Kevyn Smith",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/KSmith8888/node-sqlite-test/issues"
+    },
+    "homepage": "https://github.com/KSmith8888/node-sqlite-test#readme"
+}
