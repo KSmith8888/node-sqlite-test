@@ -3,18 +3,18 @@ const database = new DatabaseSync("./notes.db");
 
 const getNotes = async (req, res) => {
     try {
-        /*
         database.exec(`
-        CREATE TABLE notes(
+        CREATE TABLE IF NOT EXISTS notes(
             key INTEGER PRIMARY KEY,
             title TEXT,
             content TEXT
             ) STRICT
         `);
+        const insert = database.prepare(
+            "INSERT INTO notes (key, title, content) VALUES (?, ?, ?)"
+        );
         insert.run(1, "First Title", "The content of the first note");
         insert.run(2, "Now the Second", "Finally the second note");
-        const firstID = crypto.randomUUID();
-        */
         const query = database.prepare("SELECT * FROM notes ORDER BY key");
         const allNotes = query.all();
         res.status(200);
@@ -33,9 +33,9 @@ const getNotes = async (req, res) => {
 
 const createNote = async (req, res) => {
     try {
-        const id = req.body.id;
+        const id = crypto.randomUUID();
         const title = req.body.title;
-        const content = req / body.content;
+        const content = req.body.content;
         if (
             !id ||
             !title ||
