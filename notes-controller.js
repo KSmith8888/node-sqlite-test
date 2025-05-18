@@ -5,17 +5,12 @@ const getNotes = async (req, res) => {
     try {
         database.exec(`
         CREATE TABLE IF NOT EXISTS notes(
-            key INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY,
             title TEXT,
             content TEXT
             ) STRICT
         `);
-        const insert = database.prepare(
-            "INSERT INTO notes (key, title, content) VALUES (?, ?, ?)"
-        );
-        insert.run(1, "First Title", "The content of the first note");
-        insert.run(2, "Now the Second", "Finally the second note");
-        const query = database.prepare("SELECT * FROM notes ORDER BY key");
+        const query = database.prepare("SELECT * FROM notes ORDER BY id");
         const allNotes = query.all();
         res.status(200);
         res.json({
@@ -31,26 +26,36 @@ const getNotes = async (req, res) => {
     }
 };
 
+const getNoteById = async (req, res) => {
+    try {
+        res.status(200);
+        res.json({ message: "Got note by id" });
+    } catch (error) {
+        console.log(error.message);
+        res.status(401);
+        res.json({
+            message: error.message,
+        });
+    }
+};
+
 const createNote = async (req, res) => {
     try {
-        const id = crypto.randomUUID();
         const title = req.body.title;
         const content = req.body.content;
         if (
-            !id ||
             !title ||
             !content ||
-            typeof id !== "number" ||
             typeof title !== "string" ||
             typeof content !== "string"
         ) {
             throw new Error("Note info not provided");
         }
         const insert = database.prepare(
-            "INSERT INTO notes (key, title, content) VALUES (?, ?, ?)"
+            "INSERT INTO notes (title, content) VALUES (?, ?)"
         );
-        insert.run(id, title, content);
-        const query = database.prepare("SELECT * FROM notes ORDER BY key");
+        insert.run(title, content);
+        const query = database.prepare("SELECT * FROM notes ORDER BY id");
         const allNotes = query.all();
         res.status(201);
         res.json({
@@ -96,4 +101,4 @@ const deleteNote = async (req, res) => {
     }
 };
 
-export { getNotes, createNote, editNote, deleteNote };
+export { getNotes, getNoteById, createNote, editNote, deleteNote };
