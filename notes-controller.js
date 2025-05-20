@@ -1,13 +1,13 @@
 import { DatabaseSync } from "node:sqlite";
 const database = new DatabaseSync("./notes.db");
 
-const getNotes = async (req, res) => {
+const getAllNotes = async (req, res) => {
     try {
         database.exec(`
         CREATE TABLE IF NOT EXISTS notes(
-            id INTEGER PRIMARY KEY,
-            title TEXT,
-            content TEXT
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            content TEXT NOT NULL
             ) STRICT
         `);
         const query = database.prepare("SELECT * FROM notes ORDER BY id");
@@ -28,8 +28,15 @@ const getNotes = async (req, res) => {
 
 const getNoteById = async (req, res) => {
     try {
+        const noteId = req.params.id;
+        if (!noteId) throw new Error("No note id provided");
+        const idNum = parseInt(noteId, 10);
+        if (typeof idNum !== "number")
+            throw new Error("Note id is not a number");
+        const getNote = database.prepare("SELECT * FROM notes WHERE id = ?");
+        const note = getNote.all(idNum);
         res.status(200);
-        res.json({ message: "Got note by id" });
+        res.json({ message: "Got note by id", note });
     } catch (error) {
         console.log(error.message);
         res.status(401);
@@ -73,6 +80,25 @@ const createNote = async (req, res) => {
 
 const editNote = async (req, res) => {
     try {
+        const noteId = req.params.id;
+        const newTitle = "The new title";
+        const newContent = "The new content";
+        if (
+            !noteId ||
+            !newTitle ||
+            typeof newTitle !== "string" ||
+            !newContent ||
+            typeof newContent !== "string"
+        ) {
+            throw new Error("No note id provided");
+        }
+        const idNum = parseInt(noteId, 10);
+        if (typeof idNum !== "number")
+            throw new Error("Note id is not a number");
+        const editStatment = database.prepare(
+            "UPDATE notes SET title = ?, content = ? WHERE id = ?"
+        );
+        editStatment.all(newTitle, newContent, idNum);
         res.status(200);
         res.json({
             message: "Edited a note",
@@ -86,8 +112,15 @@ const editNote = async (req, res) => {
     }
 };
 
-const deleteNote = async (req, res) => {
+const deleteNoteById = async (req, res) => {
     try {
+        const noteId = req.params.id;
+        if (!noteId) throw new Error("No note id provided");
+        const idNum = parseInt(noteId, 10);
+        if (typeof idNum !== "number")
+            throw new Error("Note id is not a number");
+        const deleteNote = database.prepare("DELETE FROM notes WHERE id = ?");
+        deleteNote.all(idNum);
         res.status(200);
         res.json({
             message: "Deleted a note",
@@ -101,4 +134,28 @@ const deleteNote = async (req, res) => {
     }
 };
 
-export { getNotes, getNoteById, createNote, editNote, deleteNote };
+const deleteAllNotes = async (req, res) => {
+    try {
+        const deleteStatement = database.prepare("DROP TABLE notes");
+        deleteStatement.run();
+        res.status(200);
+        res.json({
+            message: "Deleted all notes",
+        });
+    } catch (error) {
+        console.log(error.message);
+        res.status(401);
+        res.json({
+            message: error.message,
+        });
+    }
+};
+
+export {
+    getAllNotes,
+    getNoteById,
+    createNote,
+    editNote,
+    deleteNoteById,
+    deleteAllNotes,
+};

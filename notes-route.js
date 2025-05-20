@@ -1,10 +1,12 @@
 import express from "express";
 
 import {
-    getNotes,
+    getAllNotes,
+    getNoteById,
     createNote,
     editNote,
-    deleteNote,
+    deleteNoteById,
+    deleteAllNotes,
 } from "./notes-controller.js";
 
 const optionsPreflight = async (req, res) => {
@@ -28,10 +30,12 @@ const optionsPreflight = async (req, res) => {
 
 const notesRouter = express.Router();
 
-notesRouter.options("/create", optionsPreflight);
-notesRouter.get("/", getNotes);
+notesRouter.options("/*wildcard", optionsPreflight);
+notesRouter.get("/", getAllNotes);
+notesRouter.get("/:id", getNoteById);
 notesRouter.post("/create", createNote);
 notesRouter.patch("/edit", editNote);
-notesRouter.delete("/delete", deleteNote);
+notesRouter.delete("/", deleteAllNotes);
+notesRouter.delete("/:id", deleteNoteById);
 
 export { notesRouter };
