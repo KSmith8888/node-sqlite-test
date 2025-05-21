@@ -34,7 +34,7 @@ notesRouter.options("/*wildcard", optionsPreflight);
 notesRouter.get("/", getAllNotes);
 notesRouter.get("/:id", getNoteById);
 notesRouter.post("/create", createNote);
-notesRouter.patch("/edit", editNote);
+notesRouter.patch("/:id", editNote);
 notesRouter.delete("/", deleteAllNotes);
 notesRouter.delete("/:id", deleteNoteById);
 
