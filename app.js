@@ -1,6 +1,7 @@
 import express from "express";
 
 import { notesRouter } from "./notes-route.js";
+import { usersRouter } from "./users-route.js";
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 app.use("/api/v1/notes", notesRouter);
+app.use("/api/v1/users", usersRouter);
 
 app.use(express.static("./public"));
 

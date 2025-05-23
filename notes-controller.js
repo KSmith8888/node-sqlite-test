@@ -1,12 +1,4 @@
-import { DatabaseSync } from "node:sqlite";
-const database = new DatabaseSync("./notes.db");
-database.exec(`
-        CREATE TABLE IF NOT EXISTS notes(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            content TEXT NOT NULL
-            ) STRICT
-        `);
+import { database } from "./index.js";
 
 const getAllNotes = async (req, res) => {
     try {
