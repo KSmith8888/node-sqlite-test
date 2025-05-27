@@ -1,6 +1,12 @@
 import express from "express";
 
-import { getAllUsers, getUserById, createUser } from "./users-controller.js";
+import {
+    getAllUsers,
+    getUserById,
+    createUser,
+    deleteUserById,
+    deleteAllUsers,
+} from "./users-controller.js";
 
 const optionsPreflight = async (req, res) => {
     try {
@@ -27,5 +33,7 @@ usersRouter.options("/*wildcard", optionsPreflight);
 usersRouter.get("/", getAllUsers);
 usersRouter.get("/:id", getUserById);
 usersRouter.post("/create", createUser);
+usersRouter.delete("/", deleteAllUsers);
+usersRouter.delete("/:id", deleteUserById);
 
 export { usersRouter };
