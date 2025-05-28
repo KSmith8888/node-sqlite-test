@@ -12,10 +12,15 @@ const getAllUsers = async (req, res) => {
         `);
         const query = database.prepare("SELECT * FROM users ORDER BY id");
         const allUsers = query.all();
+        const nameQuery = database.prepare(
+            "SELECT name FROM users ORDER BY name"
+        );
+        const allNames = nameQuery.all();
         res.status(200);
         res.json({
             message: "Got the users",
             users: allUsers,
+            names: allNames,
         });
     } catch (error) {
         console.log(error.message);
@@ -83,6 +88,34 @@ const createUser = async (req, res) => {
     }
 };
 
+const updateEmail = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        if (!userId) throw new Error("No user id provided");
+        const idNum = parseInt(userId, 10);
+        if (typeof idNum !== "number")
+            throw new Error("User id is not a number");
+        const email = req.body.email;
+        if (!email || typeof email !== "string")
+            throw new Error("No valid email provided");
+        const emailQuery = database.prepare(
+            "UPDATE users SET email = ? WHERE id = ?"
+        );
+        const updatedUser = emailQuery.all(email, idNum);
+        res.status(200);
+        res.json({
+            message: "Updated a user",
+            users: updatedUser,
+        });
+    } catch (error) {
+        console.log(error.message);
+        res.status(401);
+        res.json({
+            message: error.message,
+        });
+    }
+};
+
 const deleteUserById = async (req, res) => {
     try {
         const userId = req.params.id;
@@ -122,4 +155,11 @@ const deleteAllUsers = async (req, res) => {
     }
 };
 
-export { getAllUsers, getUserById, createUser, deleteUserById, deleteAllUsers };
+export {
+    getAllUsers,
+    getUserById,
+    createUser,
+    updateEmail,
+    deleteUserById,
+    deleteAllUsers,
+};

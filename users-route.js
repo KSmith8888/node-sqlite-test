@@ -4,6 +4,7 @@ import {
     getAllUsers,
     getUserById,
     createUser,
+    updateEmail,
     deleteUserById,
     deleteAllUsers,
 } from "./users-controller.js";
@@ -33,6 +34,7 @@ usersRouter.options("/*wildcard", optionsPreflight);
 usersRouter.get("/", getAllUsers);
 usersRouter.get("/:id", getUserById);
 usersRouter.post("/create", createUser);
+usersRouter.patch("/:id", updateEmail);
 usersRouter.delete("/", deleteAllUsers);
 usersRouter.delete("/:id", deleteUserById);
 
