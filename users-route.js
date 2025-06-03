@@ -4,6 +4,7 @@ import {
     getAllUsers,
     getUserById,
     createUser,
+    loginUser,
     updateEmail,
     deleteUserById,
     deleteAllUsers,
@@ -33,6 +34,7 @@ const usersRouter = express.Router();
 usersRouter.options("/*wildcard", optionsPreflight);
 usersRouter.get("/", getAllUsers);
 usersRouter.get("/:id", getUserById);
+usersRouter.post("/login", loginUser);
 usersRouter.post("/create", createUser);
 usersRouter.patch("/:id", updateEmail);
 usersRouter.delete("/", deleteAllUsers);

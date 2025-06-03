@@ -6,6 +6,8 @@ const getAllUsers = async (req, res) => {
         CREATE TABLE IF NOT EXISTS users(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
+            username TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
             email TEXT NOT NULL,
             age INTEGER NOT NULL
             ) STRICT
@@ -56,28 +58,67 @@ const getUserById = async (req, res) => {
 const createUser = async (req, res) => {
     try {
         const name = req.body.name;
+        const username = req.body.username;
+        const password = req.body.password;
         const email = req.body.email;
         const age = req.body.age;
         if (
             !name ||
+            !username ||
+            !password ||
             !email ||
             !age ||
             typeof name !== "string" ||
+            typeof username !== "string" ||
+            typeof password !== "string" ||
             typeof email !== "string" ||
             typeof parseInt(age, 10) !== "number"
         ) {
             throw new Error("User info not provided");
         }
         const insert = database.prepare(
-            "INSERT INTO users (name, email, age) VALUES (?, ?, ?)"
+            "INSERT INTO users (name, username, password, email, age) VALUES (?, ?, ?, ?, ?)"
         );
-        insert.run(name, email, parseInt(age, 10));
+        insert.run(name, username, password, email, parseInt(age, 10));
         const query = database.prepare("SELECT * FROM users ORDER BY id");
         const allUsers = query.all();
         res.status(201);
         res.json({
             message: "Created a user",
             users: allUsers,
+        });
+    } catch (error) {
+        console.log(error.message);
+        res.status(401);
+        res.json({
+            message: error.message,
+        });
+    }
+};
+
+const loginUser = async (req, res) => {
+    try {
+        const username = req.body.username;
+        const password = req.body.password;
+        if (
+            !username ||
+            !password ||
+            typeof username !== "string" ||
+            typeof password !== "string"
+        ) {
+            throw new Error("Invalid username or password");
+        }
+        const checkForUser = database.prepare(
+            "SELECT * FROM users WHERE username=?"
+        );
+        const userResult = checkForUser.all(username);
+        if (userResult.length !== 1 || userResult[0].password !== password) {
+            throw new Error("No user found or password does not match");
+        }
+        res.status(200);
+        res.json({
+            message: "User is logged in",
+            users: userResult,
         });
     } catch (error) {
         console.log(error.message);
@@ -159,6 +200,7 @@ export {
     getAllUsers,
     getUserById,
     createUser,
+    loginUser,
     updateEmail,
     deleteUserById,
     deleteAllUsers,

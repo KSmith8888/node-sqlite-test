@@ -6,7 +6,9 @@ const getAllNotes = async (req, res) => {
         CREATE TABLE IF NOT EXISTS notes(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
-            content TEXT NOT NULL
+            content TEXT NOT NULL,
+            user_id INTEGER NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id)
             ) STRICT
         `);
         const query = database.prepare("SELECT * FROM notes ORDER BY id");
@@ -60,9 +62,9 @@ const createNote = async (req, res) => {
             throw new Error("Note info not provided");
         }
         const insert = database.prepare(
-            "INSERT INTO notes (title, content) VALUES (?, ?)"
+            "INSERT INTO notes (title, content, user_id) VALUES (?, ?, ?)"
         );
-        insert.run(title, content);
+        insert.run(title, content, 2);
         const query = database.prepare("SELECT * FROM notes ORDER BY id");
         const allNotes = query.all();
         res.status(201);

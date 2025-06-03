@@ -11,18 +11,22 @@ async function startApp() {
             console.log(`App is listening on port ${PORT}`);
         });
         database.exec(`
-        CREATE TABLE IF NOT EXISTS notes(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            content TEXT NOT NULL
-            ) STRICT
-        `);
-        database.exec(`
         CREATE TABLE IF NOT EXISTS users(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
+            username TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
             email TEXT NOT NULL,
             age INTEGER NOT NULL
+            ) STRICT
+        `);
+        database.exec(`
+        CREATE TABLE IF NOT EXISTS notes(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            user_id INTEGER NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id)
             ) STRICT
         `);
     } catch (err) {
