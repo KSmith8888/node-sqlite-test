@@ -53,18 +53,22 @@ const createNote = async (req, res) => {
     try {
         const title = req.body.title;
         const content = req.body.content;
+        const userId = req.body.userId;
         if (
             !title ||
             !content ||
+            !userId ||
             typeof title !== "string" ||
-            typeof content !== "string"
+            typeof content !== "string" ||
+            typeof userId !== "string"
         ) {
             throw new Error("Note info not provided");
         }
         const insert = database.prepare(
             "INSERT INTO notes (title, content, user_id) VALUES (?, ?, ?)"
         );
-        insert.run(title, content, 2);
+        const idNum = userId.toString(10);
+        insert.run(title, content, idNum);
         const query = database.prepare("SELECT * FROM notes ORDER BY id");
         const allNotes = query.all();
         res.status(201);
