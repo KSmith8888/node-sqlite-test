@@ -5,24 +5,19 @@ const getAllUsers = async (req, res) => {
         database.exec(`
         CREATE TABLE IF NOT EXISTS users(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
             username TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             email TEXT NOT NULL,
-            age INTEGER NOT NULL
+            age INTEGER NOT NULL,
+            is_admin INTEGER NOT NULL
             ) STRICT
         `);
         const query = database.prepare("SELECT * FROM users ORDER BY id");
         const allUsers = query.all();
-        const nameQuery = database.prepare(
-            "SELECT name FROM users ORDER BY name"
-        );
-        const allNames = nameQuery.all();
         res.status(200);
         res.json({
             message: "Got the users",
             users: allUsers,
-            names: allNames,
         });
     } catch (error) {
         console.log(error.message);
@@ -57,18 +52,15 @@ const getUserById = async (req, res) => {
 
 const createUser = async (req, res) => {
     try {
-        const name = req.body.name;
         const username = req.body.username;
         const password = req.body.password;
         const email = req.body.email;
         const age = req.body.age;
         if (
-            !name ||
             !username ||
             !password ||
             !email ||
             !age ||
-            typeof name !== "string" ||
             typeof username !== "string" ||
             typeof password !== "string" ||
             typeof email !== "string" ||
@@ -76,10 +68,11 @@ const createUser = async (req, res) => {
         ) {
             throw new Error("User info not provided");
         }
+        const isAdmin = username === "Kevyn" ? 1 : 0;
         const insert = database.prepare(
-            "INSERT INTO users (name, username, password, email, age) VALUES (?, ?, ?, ?, ?)"
+            "INSERT INTO users (username, password, email, age, is_admin) VALUES (?, ?, ?, ?, ?)"
         );
-        insert.run(name, username, password, email, parseInt(age, 10));
+        insert.run(username, password, email, parseInt(age, 10), isAdmin);
         const query = database.prepare("SELECT * FROM users ORDER BY id");
         const allUsers = query.all();
         res.status(201);
@@ -181,6 +174,13 @@ const deleteUserById = async (req, res) => {
 
 const deleteAllUsers = async (req, res) => {
     try {
+        const userId = req.headers.user_id;
+        if (!userId) throw new Error("No user id provided");
+        const getUser = database.prepare("SELECT * FROM users WHERE id=?");
+        const idNum = parseInt(userId, 10);
+        const user = getUser.all(idNum);
+        if (!user[0] || user[0].is_admin !== 1)
+            throw new Error("User is not an admin");
         const deleteStatement = database.prepare("DROP TABLE users");
         deleteStatement.run();
         res.status(200);
