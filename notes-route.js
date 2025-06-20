@@ -4,6 +4,7 @@ import {
     getAllNotes,
     getNoteById,
     createNote,
+    completeNote,
     editNote,
     deleteNoteById,
     deleteAllNotes,
@@ -34,6 +35,7 @@ notesRouter.options("/*wildcard", optionsPreflight);
 notesRouter.get("/", getAllNotes);
 notesRouter.get("/:id", getNoteById);
 notesRouter.post("/create", createNote);
+notesRouter.patch("/complete/:id", completeNote);
 notesRouter.patch("/:id", editNote);
 notesRouter.delete("/", deleteAllNotes);
 notesRouter.delete("/:id", deleteNoteById);
