@@ -27,6 +27,7 @@ async function startApp() {
             content TEXT NOT NULL,
             user_id INTEGER NOT NULL,
             is_completed INTEGER DEFAULT 0,
+            created_at INTEGER NOT NULL,
             FOREIGN KEY (user_id) REFERENCES users(id)
             ) STRICT
         `);

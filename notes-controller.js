@@ -9,6 +9,7 @@ const getAllNotes = async (req, res) => {
             content TEXT NOT NULL,
             user_id INTEGER NOT NULL,
             is_completed INTEGER DEFAULT 0,
+            created_at INTEGER NOT NULL,
             FOREIGN KEY (user_id) REFERENCES users(id)
             ) STRICT
         `);
@@ -66,10 +67,11 @@ const createNote = async (req, res) => {
             throw new Error("Note info not provided");
         }
         const insert = database.prepare(
-            "INSERT INTO notes (title, content, user_id) VALUES (?, ?, ?)"
+            "INSERT INTO notes (title, content, user_id, created_at) VALUES (?, ?, ?, ?)"
         );
         const idNum = userId.toString(10);
-        insert.run(title, content, idNum);
+        const createdAt = Date.now();
+        insert.run(title, content, idNum, createdAt);
         const query = database.prepare("SELECT * FROM notes ORDER BY id");
         const allNotes = query.all();
         res.status(201);
